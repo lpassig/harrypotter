@@ -32,6 +32,7 @@ module "s3_bucket" {
   bucket = "${var.NAME}-mongodb-backup-s3"
   attach_public_policy = true
   acl = "public-read"
+
 }
 
 module "ec2_instance" {

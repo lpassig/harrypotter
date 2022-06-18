@@ -11,7 +11,7 @@ source "amazon-ebs" "mongodb-ubuntu" {
   ami_name = "packer_AWS_{{timestamp}}"
 
   region         = "eu-west-1"
-  source_ami     = "ami-0f29c8402f8cce65c"
+  source_ami     = "ami-63b0341a" // 16.04 Release 20171208
   instance_type  = "t2.small"
   ssh_username   = "ubuntu"
   ssh_agent_auth = false

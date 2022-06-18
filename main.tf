@@ -35,24 +35,6 @@ module "s3_bucket" {
 
 }
 
-module "ec2_instance" {
-  source = "terraform-aws-modules/ec2-instance/aws"
-
-  name = "${var.NAME}-instance"
-
-  ami                         = "ami-0b2734aa66fc72ed2" // packer image
-  instance_type               = "t2.micro"
-  availability_zone           = element(module.vpc.azs, 0)
-  monitoring                  = true
-  vpc_security_group_ids      = [module.security_group.security_group_id]
-  subnet_id                   = element(module.vpc.public_subnets, 0)
-  associate_public_ip_address = true
-  iam_instance_profile        = aws_iam_role.SSM_role
-
-
-  user_data = file("cloud-init/start-db.yaml")
-}
-
 resource "aws_iam_role" "SSM_role" {
   name = "SSM_role"
 
@@ -68,17 +50,33 @@ resource "aws_iam_role" "SSM_role" {
 EOF
 }
 
+
 resource "aws_iam_role_policy_attachment" "attach" {
   role       = aws_iam_role.SSM_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_ssm_activation" "SSM_role" {
-  name               = "ssm_activation"
-  description        = "SSM_role to activate"
-  iam_role           = aws_iam_role.SSM_role.id
-  registration_limit = "5"
-  depends_on         = [aws_iam_role_policy_attachment.attach]
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name        = "ec2_profile"
+  role        = aws_iam_role.SSM_role.name
+  depends_on  = [aws_iam_role_policy_attachment.attach]
+}
+
+module "ec2_instance" {
+  source = "terraform-aws-modules/ec2-instance/aws"
+
+  name = "${var.NAME}-instance"
+
+  ami                         = "ami-0b2734aa66fc72ed2" // packer image
+  instance_type               = "t2.micro"
+  availability_zone           = element(module.vpc.azs, 0)
+  monitoring                  = true
+  vpc_security_group_ids      = [module.security_group.security_group_id]
+  subnet_id                   = element(module.vpc.public_subnets, 0)
+  associate_public_ip_address = true
+  iam_instance_profile        = aws_iam_instance_profile.ec2_profile
+
+  user_data = file("cloud-init/start-db.yaml")
 }
 
 output "public_ip" {

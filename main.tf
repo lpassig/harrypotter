@@ -40,7 +40,7 @@ module "ec2_instance" {
   
   name = "${var.NAME}-instance"
 
-  ami                         = "ami-0f29c8402f8cce65c" // Ubuntu 16.04 LTS published: 2021-09-29T08:19:45.000Z
+  ami                         = "ami-085cddfa1ef084ba0" // Ubuntu 16.04 LTS published: 2021-09-29T08:19:45.000Z
   instance_type               = "t2.micro"
   availability_zone           = element(module.vpc.azs, 0)
   monitoring                  = true

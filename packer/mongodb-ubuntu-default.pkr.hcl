@@ -7,22 +7,10 @@ packer {
   }
 }
 
-data "hcp-packer-iteration" "mongodb-ubuntu" {
-  bucket_name = "mongodb-ubuntu"
-  channel     = "dev"
-}
-
-data "hcp-packer-image" "mongodb-ubuntu" {
-  bucket_name    = "mongodb-ubuntu-${var.AWS_REGION}"
-  iteration_id   = data.hcp-packer-iteration.mongodb-ubuntu.id
-  cloud_provider = "aws"
-  region         = "${var.AWS_REGION}"
-}
-
 source "amazon-ebs" "mongodb-ubuntu" {
   ami_name = "packer_AWS_{{timestamp}}"
 
-  region         = "${var.AWS_REGION}"
+  region         = "eu-west-1"
   source_ami     = "ami-0f29c8402f8cce65c"
   instance_type  = "t2.small"
   ssh_username   = "ubuntu"
@@ -32,7 +20,8 @@ source "amazon-ebs" "mongodb-ubuntu" {
 
 build {
   hcp_packer_registry {
-    bucket_name = "mongodb-ubuntu-${var.AWS_REGION}"
+    bucket_name = "mongodb-ubuntu-eu-west-1"
+    channel     = "dev"
     description = <<EOT
 Some nice description about the image being published to HCP Packer Registry.
     EOT
@@ -41,12 +30,11 @@ Some nice description about the image being published to HCP Packer Registry.
     }
   }
   provisioner "shell" {
-     scripts=[
-       "../scripts/install_aws_ssm.sh"]
+    scripts = ["./scripts/install_aws_ssm.sh"]
   }
   provisioner "file" {
     destination = "/tmp/"
-    source      = "../scripts"
+    source      = "./scripts"
   }
   sources = [
     "source.amazon-ebs.mongodb-ubuntu"

@@ -32,11 +32,6 @@ module "s3_bucket" {
   bucket = "${var.NAME}-mongodb-backup-s3"
   attach_public_policy = true
   acl = "public-read"
-
-  versioning = {
-    enabled = true
-  }
-
 }
 
 module "ec2_instance" {
@@ -54,7 +49,6 @@ module "ec2_instance" {
 
 
   user_data = file("scripts/add-ssh-mongodb.yaml")
-
 }
 
 output "public_ip" {

@@ -49,7 +49,7 @@ module "ec2_instance" {
   associate_public_ip_address = true
 
 
-  user_data = file("scripts/add-ssh-mongodb.yaml")
+  user_data = file("cloud-init/start-db.yaml")
 }
 
 output "public_ip" {

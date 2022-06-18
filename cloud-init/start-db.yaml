@@ -1,0 +1,31 @@
+#cloud-config
+
+# # Add users to the system. Users are added after groups are added.
+# users:
+#   - default
+#   - name: ubuntu 
+#     shell: /bin/bash
+#     primary_group: mygroup
+#     sudo: ALL=(ALL) NOPASSWD:ALL
+#     groups: users, admin
+#     lock_passwd: false
+#     ssh_authorized_keys:
+#       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDqWBFrR77h7XxBxsVvPsZcn6EkSTe7faka0a+oSUq5Qp0HmADNIQMsvDjDTxzAO89+8MODEJK3JGYoXJ/n0Amr+LRGIGl+rFCa6aFu3X6Afa+1me44GzBA/qyP+mdCA3b8R80kiNIIQLREmMIP/cTwTsUtw9mqQd4zdxLElssXeIFjG1CNk5etz//XR2YYGAUXtC+nlE2SxJT7jp7xpQqgaKjtDSnRm0s1Uqp3wT/eJChVVfhSE5EM6Zxuk/s/baYYO4HcYrLPCeCtgFWtyb1m6rwZkNHtWAZ+/5s9VZQYJQcNP4TZviXrYDMfe1/Cy6fJ/5TCU43dj/mm7bjsts/R europe\lepassig@LAPTOP-03HLBN4F
+
+# # Downloads the golang package
+# packages:
+#   - golang-go
+
+# Downloads and install mongodb and sample db
+runcmd:
+  - sudo su ubuntu
+  - privatednsname=$(curl http://169.254.169.254/latest/meta-data/hostname)
+  - sudo sed -i "s,\\(^[[:blank:]]*bindIp:\\) .*,\\1 $privatednsname," /etc/mongod.conf
+  - sudo systemctl daemon-reload
+  - sudo systemctl start mongod
+  - sudo systemctl status mongod
+  - sudo systemctl enable mongod
+  # - mongo
+  # - use testdb
+  # - show collections
+  # - db.zips.find().limit(2);

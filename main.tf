@@ -72,7 +72,7 @@ resource "aws_iam_role_policy_attachment" "attach" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_ssm_activation" "foo" {
+resource "aws_ssm_activation" "SSM_role" {
   name               = "ssm_activation"
   description        = "SSM_role to activate"
   iam_role           = aws_iam_role.SSM_role.id

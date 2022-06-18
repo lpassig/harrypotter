@@ -33,8 +33,8 @@ Some nice description about the image being published to HCP Packer Registry.
     scripts = ["./scripts/install_aws_ssm.sh", "./scripts/install_mongo_db.sh"]
   }
   provisioner "file" {
-    destination = "/tmp/"
-    source      = "../scripts"
+    destination = "/tmp"
+    source      = "./scripts"
   }
   sources = [
     "source.amazon-ebs.mongodb-ubuntu"

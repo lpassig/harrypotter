@@ -1,3 +1,16 @@
+# Get HCP generated AMI 
+data "hcp_packer_iteration" "mongodb-ubuntu" {
+  bucket_name = "mongodb-ubuntu-eu-west-1"
+  channel     = "dev"
+}
+
+data "hcp_packer_image" "mongodb-ubuntu" {
+  bucket_name    = data.hcp_packer_iteration.mongodb-ubuntu.bucket_name
+  iteration_id   = data.hcp_packer_iteration.mongodb-ubuntu.ulid
+  cloud_provider = "aws"
+  region         = "${var.AWS_REGION}"
+}
+
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
@@ -60,12 +73,14 @@ role       = aws_iam_role.ssm_role.name
 policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+
+
 module "ec2_instance" {
   source = "terraform-aws-modules/ec2-instance/aws"
 
   name = "${var.NAME}-instance"
 
-  ami                         = "ami-058b5215c4297fe0f" // packer image
+  ami                         = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image
   instance_type               = "t2.micro"
   availability_zone           = element(module.vpc.azs, 0)
   monitoring                  = true

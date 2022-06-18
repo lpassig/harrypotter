@@ -40,7 +40,7 @@ module "ec2_instance" {
 
   name = "${var.NAME}-instance"
 
-  ami                         = "ami-0c2154526577be6ef" // packer image
+  ami                         = "ami-0b2734aa66fc72ed2" // packer image
   instance_type               = "t2.micro"
   availability_zone           = element(module.vpc.azs, 0)
   monitoring                  = true
@@ -52,34 +52,32 @@ module "ec2_instance" {
   user_data = file("cloud-init/start-db.yaml")
 }
 
-#SSM
+resource "aws_iam_role" "SSM_role" {
+  name = "SSM_role"
 
-resource "aws_iam_instance_profile" "dev-resources-iam-profile" {
-  name = "ec2_profile"
-  role = aws_iam_role.dev-resources-iam-role.name
-}
-
-resource "aws_iam_role" "dev-resources-iam-role" {
-  name               = "dev-ssm-role"
-  description        = "The role for the developer resources EC2"
   assume_role_policy = <<EOF
-{
-"Version": "2012-10-17",
-"Statement": {
-"Effect": "Allow",
-"Principal": {"Service": "ec2.amazonaws.com"},
-"Action": "sts:AssumeRole"
-}
-}
-EOF
-  tags = {
-    stack = "test"
+  {
+    "Version": "2012-10-17",
+    "Statement": {
+      "Effect": "Allow",
+      "Principal": {"Service": "ssm.amazonaws.com"},
+      "Action": "sts:AssumeRole"
+    }
   }
+EOF
 }
 
-resource "aws_iam_role_policy_attachment" "dev-resources-ssm-policy" {
-  role       = aws_iam_role.dev-resources-iam-role.name
+resource "aws_iam_role_policy_attachment" "attach" {
+  role       = aws_iam_role.SSM_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_ssm_activation" "foo" {
+  name               = "ssm_activation"
+  description        = "SSM_role to activate"
+  iam_role           = aws_iam_role.SSM_role.id
+  registration_limit = "5"
+  depends_on         = [aws_iam_role_policy_attachment.attach]
 }
 
 output "public_ip" {

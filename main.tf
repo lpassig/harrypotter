@@ -35,31 +35,29 @@ module "s3_bucket" {
 
 }
 
-resource "aws_iam_role" "SSM_role" {
-  name = "SSM_role"
+resource "aws_iam_instance_profile" "ssm_profile" {
+name = "ec2_profile"
+role = aws_iam_role.ssm_role.name
+}
 
-  assume_role_policy = <<EOF
+resource "aws_iam_role" "ssm_role" {
+name        = "ec2-ssm-role"
+description = "The role for the developer resources EC2"
+assume_role_policy = <<EOF
 {
-    "Version": "2012-10-17",
-    "Statement": {
-    "Effect": "Allow",
-    "Principal": {"Service": "ssm.amazonaws.com"},
-    "Action": "sts:AssumeRole"
-  }
+"Version": "2012-10-17",
+"Statement": {
+"Effect": "Allow",
+"Principal": {"Service": "ec2.amazonaws.com"},
+"Action": "sts:AssumeRole"
+}
 }
 EOF
+
 }
-
-
-resource "aws_iam_role_policy_attachment" "attach" {
-  role       = aws_iam_role.SSM_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-resource "aws_iam_instance_profile" "ec2_profile" {
-  name        = "ec2_profile"
-  role        = aws_iam_role.SSM_role.name
-  depends_on  = [aws_iam_role_policy_attachment.attach]
+resource "aws_iam_role_policy_attachment" "ssm_policy" {
+role       = aws_iam_role.ssm_role.name
+policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 module "ec2_instance" {
@@ -74,7 +72,7 @@ module "ec2_instance" {
   vpc_security_group_ids      = [module.security_group.security_group_id]
   subnet_id                   = element(module.vpc.public_subnets, 0)
   associate_public_ip_address = true
-  iam_instance_profile        = aws_iam_instance_profile.ec2_profile.name
+  iam_instance_profile        = aws_iam_instance_profile.ssm_profile.name
 
   user_data = file("cloud-init/start-db.yaml")
 }

@@ -65,7 +65,7 @@ module "ec2_instance" {
 
   name = "${var.NAME}-instance"
 
-  ami                         = "ami-0b2734aa66fc72ed2" // packer image
+  ami                         = "ami-058b5215c4297fe0f" // packer image
   instance_type               = "t2.micro"
   availability_zone           = element(module.vpc.azs, 0)
   monitoring                  = true

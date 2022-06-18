@@ -4,12 +4,12 @@ module "vpc" {
   name = "${var.NAME}-vpc"
   cidr = "10.0.0.0/16"
 
-  enable_dns_support = true
+  enable_dns_support   = true
   enable_dns_hostnames = true
 
   azs             = ["${var.AWS_REGION}a"]
   private_subnets = ["10.0.1.0/24"]
-  public_subnets  = ["10.0.101.0/24"]  
+  public_subnets  = ["10.0.101.0/24"]
 
 }
 
@@ -29,18 +29,18 @@ module "security_group" {
 module "s3_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket = "${var.NAME}-mongodb-backup-s3"
+  bucket               = "${var.NAME}-mongodb-backup-s3"
   attach_public_policy = true
-  acl = "public-read"
+  acl                  = "public-read"
 
 }
 
 module "ec2_instance" {
-  source  = "terraform-aws-modules/ec2-instance/aws"
-  
+  source = "terraform-aws-modules/ec2-instance/aws"
+
   name = "${var.NAME}-instance"
 
-  ami                         = "ami-085cddfa1ef084ba0" // Ubuntu 16.04 LTS published: 2021-09-29T08:19:45.000Z
+  ami                         = "ami-0c2154526577be6ef" // packer image
   instance_type               = "t2.micro"
   availability_zone           = element(module.vpc.azs, 0)
   monitoring                  = true
@@ -50,6 +50,36 @@ module "ec2_instance" {
 
 
   user_data = file("cloud-init/start-db.yaml")
+}
+
+#SSM
+
+resource "aws_iam_instance_profile" "dev-resources-iam-profile" {
+  name = "ec2_profile"
+  role = aws_iam_role.dev-resources-iam-role.name
+}
+
+resource "aws_iam_role" "dev-resources-iam-role" {
+  name               = "dev-ssm-role"
+  description        = "The role for the developer resources EC2"
+  assume_role_policy = <<EOF
+{
+"Version": "2012-10-17",
+"Statement": {
+"Effect": "Allow",
+"Principal": {"Service": "ec2.amazonaws.com"},
+"Action": "sts:AssumeRole"
+}
+}
+EOF
+  tags = {
+    stack = "test"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "dev-resources-ssm-policy" {
+  role       = aws_iam_role.dev-resources-iam-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 output "public_ip" {

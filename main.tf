@@ -74,7 +74,7 @@ module "ec2_instance" {
   vpc_security_group_ids      = [module.security_group.security_group_id]
   subnet_id                   = element(module.vpc.public_subnets, 0)
   associate_public_ip_address = true
-  iam_instance_profile        = aws_iam_instance_profile.ec2_profile
+  iam_instance_profile        = aws_iam_instance_profile.ec2_profile.name
 
   user_data = file("cloud-init/start-db.yaml")
 }

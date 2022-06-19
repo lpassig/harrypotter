@@ -1,5 +1,5 @@
 # Define policy ARNs as list
-locals "iam-policy-arn" {
+locals iam-policy-arn {
   description = "IAM Policy to be attached to role"
   type = "list"
   default = [ "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", "arn:aws:iam::aws:policy/AmazonS3FullAccess"]

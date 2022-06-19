@@ -25,6 +25,7 @@ runcmd:
   - sudo systemctl start mongod
   - sudo systemctl status mongod
   - sudo systemctl enable mongod
+  - sudo systemctl enable amazon-ssm-agent
   - sudo systemctl status amazon-ssm-agent
   # - mongo
   # - use testdb

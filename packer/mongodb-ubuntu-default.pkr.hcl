@@ -29,12 +29,12 @@ Some nice description about the image being published to HCP Packer Registry.
     }
   }
   provisioner "shell" {
-    scripts = ["./scripts/install_aws_ssm.sh", "./scripts/install_mongo_db.sh"]
+    scripts = ["./scripts/install_aws_ssm_cli.sh", "./scripts/install_mongo_db.sh"]
   }
   provisioner "file" {
     source      = "./scripts"
     destination = "/home/ubuntu"
-    
+
   }
   sources = [
     "source.amazon-ebs.mongodb-ubuntu"

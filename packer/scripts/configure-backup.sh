@@ -35,13 +35,13 @@ echo "Backing up $HOST/$DBNAME to s3://$BUCKET/ on $TIME";
 /bin/tar cvf $TAR -C $DEST .
 
 # Upload tar to s3
-/usr/bin/aws s3 cp $TAR s3://$BUCKET/ --storage-class STANDARD_IA
-s3://harry-mongodb-backup-s3
+/usr/local/bin/aws s3 cp $TAR s3://$BUCKET/ --storage-class STANDARD_IA s3://harry-mongodb-backup-s3
+
 # Remove tar file locally
-/bin/rm -f $TAR
+# /bin/rm -f $TAR
 
 # Remove backup directory
-/bin/rm -rf $DEST
+#/bin/rm -rf $DEST
 
 # All done
 echo "Backup available at https://s3.amazonaws.com/$BUCKET/$TIME.tar"

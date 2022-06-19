@@ -1,6 +1,6 @@
 # Get HCP generated AMI 
 data "hcp_packer_iteration" "mongodb-ubuntu" {
-  bucket_name = "mongodb-ubuntu"
+  bucket_name = "mongodb-ubuntu-eu-west-1"
   channel     = "dev"
 }
 
@@ -79,7 +79,7 @@ module "ec2_instance" {
   source = "terraform-aws-modules/ec2-instance/aws"
 
   name = "${var.NAME}-instance"
-
+                              
   ami                         = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image
   instance_type               = "t2.micro"
   availability_zone           = element(module.vpc.azs, 0)

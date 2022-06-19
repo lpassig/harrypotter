@@ -22,7 +22,6 @@ assume_role_policy = <<EOF
 }
 }
 EOF
-
 }
 
 resource "aws_iam_role_policy_attachment" "role-policy-attachment" {

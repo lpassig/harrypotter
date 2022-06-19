@@ -8,7 +8,7 @@ HOST=$(curl http://169.254.169.254/latest/meta-data/hostname)
 DBNAME=testdb
 
 # S3 bucket name
-BUCKET=backups
+BUCKET=harry-mongodb-backup-s3
 
 # Linux user account
 USER=ubuntu
@@ -23,19 +23,19 @@ DEST=/home/$USER/backup
 TAR=$DEST/../$TIME.tar
 
 # Create backup dir (-p to avoid warning if already exists)
-mkdir -p $DEST
+sudo mkdir -p $DEST
 
 # Log
 echo "Backing up $HOST/$DBNAME to s3://$BUCKET/ on $TIME";
 
 # Dump from mongodb host into backup directory
-mongodump -h $HOST -d $DBNAME -o $DEST
+sudo mongodump -h $HOST -d $DBNAME -o $DEST
 
 # Create tar of backup directory
-tar cvf $TAR -C $DEST .
+sudo tar cvf $TAR -C $DEST .
 
 # Upload tar to s3
-aws s3 cp $TAR s3://$BUCKET/ --storage-class STANDARD_IA s3://harry-mongodb-backup-s3
+aws s3 cp $TAR s3://$BUCKET/ --storage-class STANDARD_IA
 
 # Remove tar file locally
 # rm -f $TAR

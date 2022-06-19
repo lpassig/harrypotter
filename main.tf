@@ -59,7 +59,7 @@ module "ec2_instance" {
   monitoring                  = true
   vpc_security_group_ids      = [module.security_group.security_group_id]
   subnet_id                   = element(module.vpc.public_subnets, 0)
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.ec2_s3_ssm_profile.name
 
   user_data = file("cloud-init/start-db.yaml")

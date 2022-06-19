@@ -26,6 +26,7 @@ provider "registry.terraform.io/hashicorp/hcp" {
   version = "0.32.0"
   hashes = [
     "h1:Kj9tZTIS4k1uid3Yj5lpSe5FsEeXgjsmAVdTnNN7T+s=",
+    "h1:w8K6KxzqJqi44HET/Y6+NuP+3VhtWfZPE7XlC9tyQ+E=",
     "zh:03099eb43d140aea749cf54a9d9376fed0719d5de983d8429cf98f80b27688be",
     "zh:0ada6da604ef562f2801b13cb9d1540b98cf79ef1f82979e15dfed3d37a67a50",
     "zh:0fa82a384b25a58b65523e0ea4768fa1212b1f5cfc0c9379d31162454fedcc9d",

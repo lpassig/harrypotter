@@ -1,3 +1,9 @@
+# Define policy ARNs as list
+local "iam_policy_arn" {
+  description = "IAM Policy to be attached to role"
+  type = "list"
+  default = [ "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", "arn:aws:iam::aws:policy/AmazonS3FullAccess"]
+}
 
 resource "aws_iam_instance_profile" "s3_ssm_profile" {
 name = "ec2_profile"
@@ -20,12 +26,19 @@ EOF
 
 }
 
-resource "aws_iam_role_policy_attachment" "ssm_policy" {
-role       = aws_iam_role.s3_ssm_role.name
-policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+# Then parse through the list using count
+resource "aws_iam_role_policy_attachment" "role-policy-attachment" {
+  role       = aws_iam_role.s3_ssm_role.name
+  count      = "${length(local.iam_policy_arn)}"
+  policy_arn = "${local.iam_policy_arn[count.index]}"
 }
 
-# resource "aws_iam_role_policy_attachment" "s3_policy" {
+# resource "aws_iam_role_policy_attachment" "ssm_policy" {
 # role       = aws_iam_role.s3_ssm_role.name
-# policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+# policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+# }
+
+#  resource "aws_iam_role_policy_attachment" "s3_policy" {
+#  role       = aws_iam_role.s3_ssm_role.name
+#  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 # }

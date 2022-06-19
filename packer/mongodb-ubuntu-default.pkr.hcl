@@ -33,7 +33,7 @@ Some nice description about the image being published to HCP Packer Registry.
   }
   provisioner "file" {
     destination = "/tmp"
-    source      = "../scripts"
+    source      = "./scripts"
   }
   sources = [
     "source.amazon-ebs.mongodb-ubuntu"

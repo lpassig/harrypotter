@@ -21,12 +21,11 @@ source "amazon-ebs" "mongodb-ubuntu" {
 build {
   hcp_packer_registry {
     bucket_name = "mongodb-ubuntu-eu-west-1"
-    channel     = "dev"
     description = <<EOT
 Some nice description about the image being published to HCP Packer Registry.
     EOT
     bucket_labels = {
-      "version" = "0.0.2"
+      "version" = "1.0.0"
     }
   }
   provisioner "shell" {

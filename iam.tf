@@ -1,8 +1,7 @@
-# Define policy ARNs as list
 variable iam_policy_arn {
   description = "IAM Policy to be attached to role"
   type = list(string)
-  default = [ "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", "arn:aws:iam::aws:policy/AmazonS3FullAccess"]
+  default = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", "arn:aws:iam::aws:policy/AmazonS3FullAccess"]
 }
 
 resource "aws_iam_instance_profile" "s3_ssm_profile" {
@@ -26,7 +25,6 @@ EOF
 
 }
 
-# Then parse through the list using count
 resource "aws_iam_role_policy_attachment" "role-policy-attachment" {
   role       = aws_iam_role.s3_ssm_role.name
   count      = "${length(var.iam_policy_arn)}"

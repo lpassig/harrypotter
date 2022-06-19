@@ -6,7 +6,7 @@ role = aws_iam_role.s3_ssm_role.name
 
 resource "aws_iam_role" "s3_ssm_role" {
 name        = "ec2-s3-ssm-role"
-description = "The role for the developer resources EC2"
+description = "Connect to EC2 and let EC2 write to S3"
 assume_role_policy = <<EOF
 {
 "Version": "2012-10-17",
@@ -25,7 +25,7 @@ role       = aws_iam_role.s3_ssm_role.name
 policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_role_policy_attachment" "s3_policy" {
-role       = aws_iam_role.s3_ssm_role.name
-policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-}
+# resource "aws_iam_role_policy_attachment" "s3_policy" {
+# role       = aws_iam_role.s3_ssm_role.name
+# policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+# }

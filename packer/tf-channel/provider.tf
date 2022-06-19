@@ -10,6 +10,8 @@ terraform {
   }
 }
 
+provider "hcp" {}
+
 provider "aws" {
   region = "${var.AWS_REGION}"
   default_tags {

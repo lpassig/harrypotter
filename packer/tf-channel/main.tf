@@ -1,12 +1,10 @@
-provider "hcp" {}
-
 data "hcp-packer-iteration" "mongodb-ubuntu" {
   bucket_name = "mongodb-ubuntu"
   channel     = "dev"
 }
 
 data "hcp-packer-image" "mongodb-ubuntu" {
-  bucket_name    = "mongodb-ubuntu-${var.AWS_REGION}"
+  bucket_name    = data.hcp-packer-iteration.mongodb-ubuntu.bucket_name
   iteration_id   = data.hcp-packer-iteration.mongodb-ubuntu.id
   cloud_provider = "aws"
   region         = "${var.AWS_REGION}"

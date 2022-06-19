@@ -5,7 +5,7 @@ variable iam_policy_arn {
 }
 
 resource "aws_iam_instance_profile" "s3_ssm_profile" {
-name = "ec2_profile"
+name = "ec2_s3_ssm_profile"
 role = aws_iam_role.s3_ssm_role.name
 }
 

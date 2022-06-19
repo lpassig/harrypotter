@@ -54,12 +54,12 @@ module "ec2_instance" {
   name = "${var.NAME}-instance"
                               
   ami                         = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image
-  instance_type               = "t2.small"
+  instance_type               = "t2.micro"
   availability_zone           = element(module.vpc.azs, 0)
   monitoring                  = true
   vpc_security_group_ids      = [module.security_group.security_group_id]
   subnet_id                   = element(module.vpc.public_subnets, 0)
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.s3_ssm_profile.name
 
   user_data = file("cloud-init/start-db.yaml")

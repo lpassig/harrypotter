@@ -19,8 +19,7 @@ module "vpc" {
 
   enable_dns_support   = true
   enable_dns_hostnames = true
-  enable_nat_gateway   = true // needed for ssm
-
+  
   azs             = ["${var.AWS_REGION}a"]
   private_subnets = ["10.0.1.0/24"]
   public_subnets  = ["10.0.101.0/24"]
@@ -60,7 +59,7 @@ module "ec2_instance" {
   monitoring                  = true
   vpc_security_group_ids      = [module.security_group.security_group_id]
   subnet_id                   = element(module.vpc.public_subnets, 0)
-  associate_public_ip_address = false
+  associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.ec2_s3_ssm_profile.name
 
   user_data = file("cloud-init/start-db.yaml")

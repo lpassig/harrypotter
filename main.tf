@@ -62,7 +62,7 @@ module "ec2-instance" {
   instance_type               = "t2.micro"
   availability_zone           = element(module.vpc.azs, 0)
   monitoring                  = true
-  vpc_security_group_ids      = [module.security_group.security_group_id]
+  vpc_security_group_ids      = [module.security-group.security_group_id]
   subnet_id                   = element(module.vpc.public_subnets, 0)
   associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.ec2_s3_ssm_profile.name

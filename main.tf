@@ -27,12 +27,6 @@ module "s3-bucket" {
 
 }
 
-output "lol" {
-
-  value = nonsensitive(data.tfe_outputs.outputs.values.availability_zone)
-  
-}
-
 module "ec2-instance" {
   source  = "app.terraform.io/propassig/ec2-instance/aws"
   version = "4.0.0"
@@ -41,12 +35,12 @@ module "ec2-instance" {
                               
   ami                         = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image
   instance_type               = "t2.micro"
-  availability_zone           = data.tfe_outputs.outputs.values.availability_zone
+  availability_zone           = nonsensitive(data.tfe_outputs.outputs.values.availability_zone)
   monitoring                  = true
-  vpc_security_group_ids      = data.tfe_outputs.outputs.values.vpc_security_group_ids
-  subnet_id                   = data.tfe_outputs.outputs.values.subnet_id
+  vpc_security_group_ids      = nonsensitive(data.tfe_outputs.outputs.values.vpc_security_group_ids)
+  subnet_id                   = nonsensitive(data.tfe_outputs.outputs.values.subnet_id)
   associate_public_ip_address = true
-  iam_instance_profile        = data.tfe_outputs.outputs.values.instance_profile
+  iam_instance_profile        = nonsensitive(data.tfe_outputs.outputs.values.instance_profile)
 
   user_data = file("cloud-init/start-db.yaml")
 }

@@ -52,12 +52,12 @@ module "ec2-instance" {
                               
   ami                         = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image
   instance_type               = "t2.micro"
-  availability_zone           = data.tfe_outputs.availability_zone.values
+  availability_zone           = "${data.tfe_outputs.availability_zone.values}"
   monitoring                  = true
-  vpc_security_group_ids      = data.tfe_outputs.vpc_security_group_ids.values
-  subnet_id                   = data.tfe_outputs.subnet_id
+  vpc_security_group_ids      = tolist(data.tfe_outputs.vpc_security_group_ids.values)
+  subnet_id                   = "${data.tfe_outputs.subnet_id}"
   associate_public_ip_address = true
-  iam_instance_profile        = data.tfe_outputs.instance_profile
+  iam_instance_profile        = "${data.tfe_outputs.instance_profile}"
 
   user_data = file("cloud-init/start-db.yaml")
 }

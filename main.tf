@@ -54,7 +54,7 @@ module "ec2-instance" {
   instance_type               = "t2.micro"
   availability_zone           = tostring(data.tfe_outputs.availability_zone.values)
   monitoring                  = true
-  vpc_security_group_ids      = tostring(data.tfe_outputs.vpc_security_group_ids.values)
+  vpc_security_group_ids      = tolist(data.tfe_outputs.vpc_security_group_ids.values)
   subnet_id                   = tostring(data.tfe_outputs.subnet_id)
   associate_public_ip_address = true
   iam_instance_profile        = tostring(data.tfe_outputs.instance_profile)

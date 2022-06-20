@@ -11,24 +11,7 @@ data "hcp_packer_image" "mongodb-ubuntu" {
   region         = "${var.AWS_REGION}"
 }
 
-data "tfe_outputs" "vpc_id" {
-  organization = "propassig"
-  workspace = "hogwarts"
-}
-data "tfe_outputs" "subnet_id" {
-  organization = "propassig"
-  workspace = "hogwarts"
-}
-data "tfe_outputs" "availability_zone" {
-  organization = "propassig"
-  workspace = "hogwarts"
-}
-data "tfe_outputs" "instance_profile" {
-  organization = "propassig"
-  workspace = "hogwarts"
-}
-
-data "tfe_outputs" "vpc_security_group_ids" {
+data "tfe_outputs" "outputs" {
   organization = "propassig"
   workspace = "hogwarts"
 }
@@ -44,6 +27,12 @@ module "s3-bucket" {
 
 }
 
+output "lol" {
+
+  value = nonsensitive(data.tfe_outputs.outputs.values.availability_zone)
+  
+}
+
 module "ec2-instance" {
   source  = "app.terraform.io/propassig/ec2-instance/aws"
   version = "4.0.0"
@@ -52,12 +41,12 @@ module "ec2-instance" {
                               
   ami                         = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image
   instance_type               = "t2.micro"
-  availability_zone           = data.tfe_outputs.availability_zone.values.value
+  availability_zone           = data.tfe_outputs.outputs.values.availability_zone
   monitoring                  = true
-  vpc_security_group_ids      = [data.tfe_outputs.vpc_security_group_ids.values.value]
-  subnet_id                   = data.tfe_outputs.subnet_id.values.value
+  vpc_security_group_ids      = data.tfe_outputs.outputs.values.vpc_security_group_ids
+  subnet_id                   = data.tfe_outputs.outputs.values.subnet_id
   associate_public_ip_address = true
-  iam_instance_profile        = data.tfe_outputs.instance_profile.values.value
+  iam_instance_profile        = data.tfe_outputs.outputs.values.instance_profile
 
   user_data = file("cloud-init/start-db.yaml")
 }

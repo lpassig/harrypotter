@@ -12,22 +12,24 @@ data "hcp_packer_image" "mongodb-ubuntu" {
 }
 
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source  = "app.terraform.io/propassig/vpc/aws"
+  version = "1.23.0"
 
   name = "${var.NAME}-vpc"
   cidr = "10.0.0.0/16"
 
   enable_dns_support   = true
   enable_dns_hostnames = true
-  
+
   azs             = ["${var.AWS_REGION}a"]
   private_subnets = ["10.0.1.0/24"]
   public_subnets  = ["10.0.101.0/24"]
 
 }
 
-module "security_group" {
-  source = "terraform-aws-modules/security-group/aws"
+module "security-group" {
+  source  = "app.terraform.io/propassig/security-group/aws"
+  version = "4.9.0"
 
   name        = "${var.NAME}-sg"
   description = "Security group for EC2 instance"
@@ -39,8 +41,10 @@ module "security_group" {
 
 }
 
-module "s3_bucket" {
-  source = "terraform-aws-modules/s3-bucket/aws"
+module "s3-bucket" {
+  source  = "app.terraform.io/propassig/s3-bucket/aws"
+  version = "3.3.0"
+ 
 
   bucket               = "${var.NAME}-mongodb-backup-s3"
   attach_public_policy = true
@@ -48,8 +52,9 @@ module "s3_bucket" {
 
 }
 
-module "ec2_instance" {
-  source = "terraform-aws-modules/ec2-instance/aws"
+module "ec2-instance" {
+  source  = "app.terraform.io/propassig/ec2-instance/aws"
+  version = "4.0.0"
 
   name = "${var.NAME}-instance"
                               
@@ -65,127 +70,58 @@ module "ec2_instance" {
   user_data = file("cloud-init/start-db.yaml")
 }
 
+#
+##
+### EKS
+##
+#
+# data "aws_eks_cluster" "eks-cluster" {
+#   name = module.eks.cluster_id
+# }
+
+# data "aws_eks_cluster_auth" "eks-cluster" {
+#   name = module.eks.cluster_id
+# }
+
 # module "eks" {
 #   source  = "terraform-aws-modules/eks/aws"
-#   version = "~> 18.0"
 
-#   cluster_name    = "${var.NAME}-cluster"
-#   cluster_version = "1.21"
+#   cluster_name    = "${var.NAME}-eks"
+#   cluster_version = "1.18"
+#   subnets         = module.vpc.private_subnets
 
-#   cluster_endpoint_private_access = true
-#   cluster_endpoint_public_access  = true
+#   vpc_id = module.vpc.vpc_id
 
-#   cluster_addons = {
-#     coredns = {
-#       resolve_conflicts = "OVERWRITE"
+#   node_groups = {
+#     alpha = {
+#       desired_capacity = 1
+#       max_capacity     = 3
+#       min_capacity     = 1
+#       disk_size        = var.wn-disk-size
+#       instance_types   = var.wn-instance-types[var.stage]
+#       subnets          = [module.vpc.private_subnets[0]]
 #     }
-#     kube-proxy = {}
-#     vpc-cni = {
-#       resolve_conflicts = "OVERWRITE"
+
+#     beta = {
+#       desired_capacity = 1
+#       max_capacity     = 3
+#       min_capacity     = 1
+#       disk_size        = var.wn-disk-size
+#       instance_types   = var.wn-instance-types[var.stage]
+#       subnets          = [module.vpc.private_subnets[1]]
 #     }
-#   }
 
-#   cluster_encryption_config = [{
-#     provider_key_arn = "ac01234b-00d9-40f6-ac95-e42345f78b00"
-#     resources        = ["secrets"]
-#   }]
-
-#   vpc_id     = "vpc-1234556abcdef"
-#   subnet_ids = ["subnet-abcde012", "subnet-bcde012a", "subnet-fghi345a"]
-
-#   # Self Managed Node Group(s)
-#   self_managed_node_group_defaults = {
-#     instance_type                          = "m6i.large"
-#     update_launch_template_default_version = true
-#     iam_role_additional_policies = [
-#       "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-#     ]
-#   }
-
-#   self_managed_node_groups = {
-#     one = {
-#       name         = "mixed-1"
-#       max_size     = 5
-#       desired_size = 2
-
-#       use_mixed_instances_policy = true
-#       mixed_instances_policy = {
-#         instances_distribution = {
-#           on_demand_base_capacity                  = 0
-#           on_demand_percentage_above_base_capacity = 10
-#           spot_allocation_strategy                 = "capacity-optimized"
-#         }
-
-#         override = [
-#           {
-#             instance_type     = "m5.large"
-#             weighted_capacity = "1"
-#           },
-#           {
-#             instance_type     = "m6i.large"
-#             weighted_capacity = "2"
-#           },
-#         ]
-#       }
+#     gamma = {
+#       desired_capacity = 1
+#       max_capacity     = 3
+#       min_capacity     = 1
+#       disk_size        = var.wn-disk-size
+#       instance_types   = var.wn-instance-types[var.stage]
+#       subnets          = [module.vpc.private_subnets[2]]
 #     }
 #   }
+#   workers_additional_policies = ["arn:aws:iam::aws:policy/AmazonElasticFileSystemFullAccess"]
 
-#   # EKS Managed Node Group(s)
-#   eks_managed_node_group_defaults = {
-#     disk_size      = 50
-#     instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
-#   }
-
-#   eks_managed_node_groups = {
-#     blue = {}
-#     green = {
-#       min_size     = 1
-#       max_size     = 10
-#       desired_size = 1
-
-#       instance_types = ["t3.large"]
-#       capacity_type  = "SPOT"
-#     }
-#   }
-
-#   # Fargate Profile(s)
-#   fargate_profiles = {
-#     default = {
-#       name = "default"
-#       selectors = [
-#         {
-#           namespace = "default"
-#         }
-#       ]
-#     }
-#   }
-
-#   # aws-auth configmap
-#   manage_aws_auth_configmap = true
-
-#   aws_auth_roles = [
-#     {
-#       rolearn  = "arn:aws:iam::66666666666:role/role1"
-#       username = "role1"
-#       groups   = ["system:masters"]
-#     },
-#   ]
-
-#   aws_auth_users = [
-#     {
-#       userarn  = "arn:aws:iam::66666666666:user/user1"
-#       username = "user1"
-#       groups   = ["system:masters"]
-#     },
-#     {
-#       userarn  = "arn:aws:iam::66666666666:user/user2"
-#       username = "user2"
-#       groups   = ["system:masters"]
-#     },
-#   ]
-
-#   aws_auth_accounts = [
-#     "777777777777",
-#     "888888888888",
-#   ]
+#   write_kubeconfig   = true
+#   config_output_path = "./"
 # }

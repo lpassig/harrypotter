@@ -13,7 +13,7 @@ data "hcp_packer_image" "mongodb-ubuntu" {
 
 module "vpc" {
   source  = "app.terraform.io/propassig/vpc/aws"
-  version = "1.23.0"
+  version = "3.14.1"
 
   name = "${var.NAME}-vpc"
   cidr = "10.0.0.0/16"

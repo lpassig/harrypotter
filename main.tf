@@ -11,34 +11,26 @@ data "hcp_packer_image" "mongodb-ubuntu" {
   region         = "${var.AWS_REGION}"
 }
 
-module "vpc" {
-  source  = "app.terraform.io/propassig/vpc/aws"
-  version = "3.14.1"
-
-  name = "${var.NAME}-vpc"
-  cidr = "10.0.0.0/16"
-
-  enable_dns_support   = true
-  enable_dns_hostnames = true
-
-  azs             = ["${var.AWS_REGION}a"]
-  private_subnets = ["10.0.1.0/24"]
-  public_subnets  = ["10.0.101.0/24"]
-
+data "tfe_outputs" "vpc_id" {
+  organization = "propassig"
+  workspace = "hogwarts"
+}
+data "tfe_outputs" "subnet_id" {
+  organization = "propassig"
+  workspace = "hogwarts"
+}
+data "tfe_outputs" "availability_zone" {
+  organization = "propassig"
+  workspace = "hogwarts"
+}
+data "tfe_outputs" "instance_profile" {
+  organization = "propassig"
+  workspace = "hogwarts"
 }
 
-module "security-group" {
-  source  = "app.terraform.io/propassig/security-group/aws"
-  version = "4.9.0"
-
-  name        = "${var.NAME}-sg"
-  description = "Security group for EC2 instance"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["http-80-tcp"]
-  egress_rules        = ["all-all"]
-
+data "tfe_outputs" "vpc_security_group_ids" {
+  organization = "propassig"
+  workspace = "hogwarts"
 }
 
 module "s3-bucket" {
@@ -60,12 +52,12 @@ module "ec2-instance" {
                               
   ami                         = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image
   instance_type               = "t2.micro"
-  availability_zone           = element(module.vpc.azs, 0)
+  availability_zone           = data.tfe_outputs.availability_zone.values
   monitoring                  = true
-  vpc_security_group_ids      = [module.security-group.security_group_id]
-  subnet_id                   = element(module.vpc.public_subnets, 0)
+  vpc_security_group_ids      = data.tfe_outputs.vpc_security_group_ids.values
+  subnet_id                   = data.tfe_outputs.subnet_id
   associate_public_ip_address = true
-  iam_instance_profile        = aws_iam_instance_profile.ec2_s3_ssm_profile.name
+  iam_instance_profile        = data.tfe_outputs.instance_profile
 
   user_data = file("cloud-init/start-db.yaml")
 }

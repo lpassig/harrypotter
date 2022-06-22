@@ -1,15 +1,15 @@
-# Get HCP generated AMI 
-# data "hcp_packer_iteration" "mongodb-ubuntu" {
-#   bucket_name = "mongodb-ubuntu-eu-west-1"
-#   channel     = "dev"
-# }
+ Get HCP generated AMI 
+ data "hcp_packer_iteration" "mongodb-ubuntu" {
+   bucket_name = "mongodb-ubuntu-eu-west-1"
+   channel     = "dev"
+ }
 
-# data "hcp_packer_image" "mongodb-ubuntu" {
-#   bucket_name    = data.hcp_packer_iteration.mongodb-ubuntu.bucket_name
-#   iteration_id   = data.hcp_packer_iteration.mongodb-ubuntu.ulid
-#   cloud_provider = "aws"
-#   region         = "${var.AWS_REGION}"
-# }
+ data "hcp_packer_image" "mongodb-ubuntu" {
+   bucket_name    = data.hcp_packer_iteration.mongodb-ubuntu.bucket_name
+   iteration_id   = data.hcp_packer_iteration.mongodb-ubuntu.ulid
+   cloud_provider = "aws"
+   region         = "${var.AWS_REGION}"
+ }
 
 data "tfe_outputs" "outputs" {
   organization = "propassig"
@@ -33,7 +33,7 @@ module "ec2-instance" {
 
   name = "${var.NAME}-instance"
                               
-  ami                         = "ami-02bcb9d2fae1fc079" //data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image
+  ami                         = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image (Alternative: "ami-02bcb9d2fae1fc079")
   instance_type               = "t2.micro"
   availability_zone           = nonsensitive(data.tfe_outputs.outputs.values.availability_zone)
   monitoring                  = true

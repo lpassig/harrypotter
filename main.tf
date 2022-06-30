@@ -1,6 +1,6 @@
  # Get HCP generated AMI 
  data "hcp_packer_iteration" "mongodb-ubuntu" {
-   bucket_name = "mongodb-ubuntu-eu-west-1"
+   bucket_name = "ubuntu-mongodb-old"
    channel     = "dev"
  }
 

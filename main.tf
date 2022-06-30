@@ -13,7 +13,7 @@
 
 data "tfe_outputs" "outputs" {
   organization = "propassig"
-  workspace = "hogwarts"
+  workspace = "Gryffindor_AWS_LandingZone"
 }
 
 module "s3-bucket" {

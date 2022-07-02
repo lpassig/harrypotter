@@ -2,7 +2,7 @@ terraform {
   cloud {
     organization = "propassig"
     workspaces {
-      name = "Project_Draco_Azure_LandingZone"
+      name = "AWS_Project_Harry"
     }
   }
   required_providers {

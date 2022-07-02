@@ -1,4 +1,10 @@
 terraform {
+  cloud {
+    organization = "propassig"
+    workspaces {
+      name = "Project_Draco_Azure_LandingZone"
+    }
+  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"

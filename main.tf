@@ -34,7 +34,7 @@ module "ec2-instance" {
   name = "${var.NAME}-instance"
                               
   ami                         = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image (Alternative: "ami-02bcb9d2fae1fc079")
-  instance_type               = "t2.small"
+  instance_type               = "t2.micro"
   availability_zone           = nonsensitive(data.tfe_outputs.outputs.values.availability_zone)
   monitoring                  = true
   vpc_security_group_ids      = nonsensitive(data.tfe_outputs.outputs.values.vpc_security_group_ids)
